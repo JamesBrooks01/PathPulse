@@ -123,3 +123,4 @@ poetry.lock
 
 #user
 .vercel
+db.sqlite3
