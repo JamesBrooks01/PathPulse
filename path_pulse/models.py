@@ -12,4 +12,4 @@ class User(models.Model):
     )
 
     def __str__(self):
-        return self.user_trips
+        return str(self.user_trips)
