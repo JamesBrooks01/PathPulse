@@ -1,10 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.views import generic
 from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .models import User
+from .models import User, Trip
 
 # Create your views here.
 
@@ -13,6 +13,12 @@ class IndexView(generic.ListView):
     context_object_name = 'users'
     def get_queryset(self):
         return User.objects.filter(user_email='example@email.com')
+    
+class DetailView(generic.ListView):
+    template_name = 'path_pulse/detail.html'
+    context_object_name = 'trips'
+    def get_queryset(self):
+        return Trip.objects.filter(user_id = self.kwargs['pk'])
     
 class VoteView(generic.DetailView):
     model = User
