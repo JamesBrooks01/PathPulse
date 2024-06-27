@@ -1,0 +1,7 @@
+{% if trips %}
+    {% for trip in trips %}
+        <p>{{trip}}</p>
+    {% endfor %}
+{% else %}
+    <p>No Trips</p>
+{% endif %}

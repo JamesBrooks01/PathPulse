@@ -1,0 +1,9 @@
+{% if users %}
+    <ul>
+    {% for user in users %}
+        <li><a href="{% url 'path_pulse:trip' user.id %}">{{ user }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Hello World</p>
+{% endif %}
