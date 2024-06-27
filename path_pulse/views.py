@@ -20,11 +20,12 @@ class DetailView(generic.ListView):
     def get_queryset(self):
         return Trip.objects.filter(user_id = self.kwargs['pk'])
     
-class VoteView(generic.DetailView):
-    model = User
+class VoteView(generic.ListView):
+    model = Trip
     template_name = 'path_pulse/vote.html'
+    context_object_name = 'user'
     def get_queryset(self):
-        return User.objects.filter(user_email='example@email.com')
+        return get_object_or_404(User, pk=self.kwargs['pk'])
     
 def vote(request, user_id):
     try:
