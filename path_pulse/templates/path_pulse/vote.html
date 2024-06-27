@@ -1,12 +1,10 @@
 <form action="{% url 'path_pulse:vote' user.id %}" method="post">
     {% csrf_token %}
     <fieldset>
-        <legend><h1>{{ user.user_trips }}</h1></legend>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        {% for trip in user.choice_set.all %}
-            <input type="radio" name="trip" id="trip{{ forloop.counter }}" value="{{ trip.id }}">
-            <label for="trip{{ forloop.counter }}">{{ trip.user_trips }}</label><br>
-        {% endfor %}
+            <input type="text" name="location">Location
+            <input type="date" name="start_date">Start Date
+            <input type="date" name="end_date">End Date
     </fieldset>
     <input type="submit" value="Vote">
     </form>
