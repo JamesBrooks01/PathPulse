@@ -28,11 +28,12 @@ class VoteView(generic.ListView):
         return get_object_or_404(User, pk=self.kwargs['pk'])
     
 def vote(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
     try:
-        user = get_object_or_404(User, pk=user_id)
+        form_data = request.POST
+        trip = Trip(user=user, location=form_data['location'], start_date=form_data['start_date'], end_date=form_data['end_date'])
     except (KeyError, User.DoesNotExist):
-        return render(request,'path_pulse/index.html')
+        return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Please provide trip information",},)
     else:
-        user.user_trips[0].append(['Moclips', '06-26-2024', '06-29-2024'])
-        user.save()
+        trip.save()
         return HttpResponseRedirect(reverse('path_pulse:index'))
