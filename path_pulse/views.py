@@ -10,9 +10,9 @@ from .models import User, Trip
 
 class IndexView(generic.ListView):
     template_name = 'path_pulse/index.html'
-    context_object_name = 'users'
+    context_object_name = 'user'
     def get_queryset(self):
-        return User.objects.filter(user_email='example@email.com')
+        return get_list_or_404(User)
     
 class DetailView(generic.ListView):
     template_name = 'path_pulse/detail.html'
@@ -32,8 +32,18 @@ def vote(request, user_id):
     try:
         form_data = request.POST
         trip = Trip(user=user, location=form_data['location'], start_date=form_data['start_date'], end_date=form_data['end_date'])
-    except (KeyError, User.DoesNotExist):
+    except (KeyError, user.DoesNotExist):
         return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Please provide trip information",},)
     else:
         trip.save()
+        return HttpResponseRedirect(reverse('path_pulse:index'))
+    
+def delete_trip(request, trip_id, user_id):
+    trip = get_object_or_404(Trip, pk=trip_id)
+    user = get_object_or_404(User, pk=user_id)
+    try:
+        trip.delete()
+    except(KeyError, trip.DoesNotExist, user.id != trip.user_id):
+        return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Trip does not Exist",},)
+    else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
