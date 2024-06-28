@@ -1,7 +1,10 @@
 {% if trips %}
+<a href="{% url 'path_pulse:index' %}">Return to Index</a>
+    <ul>
     {% for trip in trips %}
-        <p>{{trip}}</p>
+    <li>{{trip}} --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
     {% endfor %}
+    </ul>
 {% else %}
     <p>No Trips</p>
 {% endif %}
