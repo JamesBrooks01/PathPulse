@@ -20,8 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('', include('path_pulse.urls')),
     path("admin/", admin.site.urls),
-    path('pathpulse/', include('path_pulse.urls')),
 ]
 
 if not settings.TESTING:
