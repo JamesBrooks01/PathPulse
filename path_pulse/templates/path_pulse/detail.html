@@ -1,5 +1,5 @@
-{% if trips %}
 <a href="{% url 'path_pulse:index' %}">Return to Index</a>
+{% if trips %}
     <ul>
     {% for trip in trips %}
     <li>{{trip}} --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
