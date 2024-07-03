@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from .models import User, Trip
+from utilities_dir import weather_data
 
 # Create your views here.
 
@@ -47,3 +48,7 @@ def delete_trip(request, trip_id, user_id):
         return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Trip does not Exist",},)
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
+    
+def trip_print(request):
+    data = weather_data.historic_weather(52.52,13.41,'2024-06-01','2024-06-07')
+    return render(request,'path_pulse/trip_print.html', {'trip': data})

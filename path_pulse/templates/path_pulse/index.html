@@ -4,6 +4,10 @@
         <li><a href="{% url 'path_pulse:detail' user.id %}">View Trips for {{ user }}</a> --- <a href="{% url 'path_pulse:trip' user.id %}">Add a Trip to this User</a></li>
     {% endfor %}
     </ul>
+    <footer>
+        <a href='https://locationiq.com'>Location Data provided by LocationIQ.com</a>
+        <a href='https://open-meteo.com'>Weather Data provided by open-metro.com</a>
+    </footer>
 {% else %}
     <p>Hello World</p>
 {% endif %}
