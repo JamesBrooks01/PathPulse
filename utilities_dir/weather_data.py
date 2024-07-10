@@ -16,7 +16,7 @@ with open('utilities_dir/weather_codes.json') as weather_file:
 
 
 def location_data(data):
-    sanitized_spaces = data['location'].replace(' ', '%20')
+    sanitized_spaces = data.location.replace(' ', '%20')
     api_key = os.environ.get('LOCATION_API')
     url = f'https://us1.locationiq.com/v1/search?key={api_key}&q={sanitized_spaces}&format=json'
     response = requests.get(url)
@@ -74,9 +74,13 @@ def historic_weather(lat,lon,start,end):
     return_data = converted['daily']
     return_dict = {}
 
+    with open('') as weather_codes:
+        codes = json.load(weather_codes)
+
     for x in range(len(return_data['time'])):
         return_dict[return_data['time'][x]] = {
-            'code': return_data['weather_code'][x],
+            'code': codes[f"{return_data['weather_code'][x]}"]['description'],
+            'img': codes[f"{return_data['weather_code'][x]}"]['image'],
             'high': return_data['temperature_2m_max'][x],
             'low': return_data['temperature_2m_min'][x]
         }
