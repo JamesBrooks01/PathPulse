@@ -1,10 +1,16 @@
+{% extends "path_pulse/base.html" %}
+
+{% block body %}
+
 <a href="{% url 'path_pulse:index' %}">Return to Index</a>
 {% if trips %}
-    <ul>
+<ul>
     {% for trip in trips %}
-    <li>{{trip}} --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
+    <li><a href="{% url 'path_pulse:print_test' trip.id %}"> View Trip</a> --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
     {% endfor %}
-    </ul>
+</ul>
 {% else %}
-    <p>No Trips</p>
+<p>No Trips</p>
 {% endif %}
+
+{% endblock %}

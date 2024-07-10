@@ -49,6 +49,8 @@ def delete_trip(request, trip_id, user_id):
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
-def trip_print(request):
-    data = weather_data.historic_weather(52.52,13.41,'2024-06-01','2024-06-07')
+def trip_print(request, trip_id):
+    trip = get_object_or_404(Trip, pk=trip_id)
+    location = weather_data.location_data(trip)
+    data = weather_data.historic_weather(lat=location['lat'], lon=location['lon'], start=trip.start_date, end=trip.end_date)
     return render(request,'path_pulse/trip_print.html', {'trip': data})

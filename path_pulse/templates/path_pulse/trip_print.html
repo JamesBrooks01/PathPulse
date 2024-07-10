@@ -1,1 +1,24 @@
+{% extends "path_pulse/base.html" %}
+
+{% block body %}
+
+{% if trip %}
+<ul>
+    {% for key, value in trip.items %}
+    <li>
+        On {{key}}, the Weather should be {{value.code}} with a High of {{value.high}} and a Low of {{value.low}}
+    </li>
+    <li>
+        <img id="weatherImg" src='{{value.img}}'>
+    </li>
+    {% endfor %}
+
+</ul>
+
 {{trip}}
+{% else %}
+<p>No Data</p>
+{% endif %}
+
+
+{% endblock %}
