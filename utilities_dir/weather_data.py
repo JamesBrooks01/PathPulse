@@ -1,5 +1,6 @@
 import datetime
 from datetime import date
+from datetime import datetime as datetime_object
 import os
 import openmeteo_requests
 import requests_cache
@@ -29,26 +30,30 @@ def location_data(data):
 
 def weather_data(data):
     coords = location_data(data)
-    today = date.today()
-    start_unix = datetime.datetime.fromisoformat(data['start_date'])
-    end_unix = datetime.datetime.fromisoformat(data['end_date'])
-    days_from_today = round((start_unix - today) // 86400)
-    if days_from_today < 0:
-        return 'Invalid Date, Start Date is in the Past'
-    boundry = today + (7 * 86400)
+    today = datetime_object.today()
+    start_date_formatted = datetime_object.fromisoformat(data['start_date'])
+    end_date_formatted = datetime_object.fromisoformat(data['end_date'])
+    start_unix = datetime_object.timestamp(start_date_formatted)
+    end_unix = datetime_object.timestamp(end_date_formatted)
+    today_unix = datetime_object.timestamp(datetime_object.today())
 
-    forecast = []
-    historic = []
+    if start_unix < today_unix:
+        return 'Invalid Date, Start Date is in the Past'
+    
+    boundry = today_unix + (7 * 86400)
+
+    forecast = {}
+    historic = {}
     all_weather = {}
     date_list = []
 
     marker = start_unix
     while marker <= end_unix:
-        date_list.append(marker)
+        date_list.append(str(date.fromtimestamp(marker)))
         marker + 86400
 
     if start_unix >= boundry:
-        historic_weather()
+        historic_weather(lat=coords['lat'], lon=coords['lon'], date_list=date_list, historic=historic)
     elif end_unix >= boundry:
         both_weather()
     else:
