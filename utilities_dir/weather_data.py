@@ -74,13 +74,11 @@ def historic_weather(lat,lon,start,end):
     return_data = converted['daily']
     return_dict = {}
 
-    with open(os.environ.get('WEATHER_ABSOLUTE_PATH')) as weather_codes:
-        codes = json.load(weather_codes)
 
     for x in range(len(return_data['time'])):
         return_dict[return_data['time'][x]] = {
-            'code': codes[f"{return_data['weather_code'][x]}"]['description'],
-            'img': codes[f"{return_data['weather_code'][x]}"]['image'],
+            'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
+            'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
             'high': return_data['temperature_2m_max'][x],
             'low': return_data['temperature_2m_min'][x]
         }
