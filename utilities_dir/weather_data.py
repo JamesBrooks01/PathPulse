@@ -59,14 +59,15 @@ def weather_data(data):
     else:
         forecast_weather()
 
-
-def historic_weather(lat,lon,start,end):
+def historic_weather(lat,lon,date_list, historic):
     url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
+    start_date_past= datetime_object.fromisoformat(date_list[0]) - datetime.timedelta(365)
+    end_date_past= datetime_object.fromisoformat(date_list[-1]) - datetime.timedelta(365)
     params = {
         "latitude": lat,
         "longitude": lon,
-        "start_date": start,
-        "end_date": end,
+        "start_date": start_date_past,
+        "end_date": end_date_past,
         "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min"],
         "temperature_unit": "fahrenheit",
         "wind_speed_unit": "mph",
@@ -77,17 +78,16 @@ def historic_weather(lat,lon,start,end):
     response = requests.get(url,params=params)
     converted = json.loads(response.text)
     return_data = converted['daily']
-    return_dict = {}
 
 
     for x in range(len(return_data['time'])):
-        return_dict[return_data['time'][x]] = {
+        historic[return_data['time'][x]] = {
             'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
             'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
             'high': return_data['temperature_2m_max'][x],
             'low': return_data['temperature_2m_min'][x]
         }
-    return return_dict
+    return historic
 
 def forecast_weather():
     pass
