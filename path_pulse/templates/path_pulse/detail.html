@@ -6,7 +6,7 @@
 {% if trips %}
 <ul>
     {% for trip in trips %}
-    <li><a href="{% url 'path_pulse:print_test' trip.id %}"> View Trip</a> --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
+    <li><a href="{% url 'path_pulse:print_test' trip.id trip.user_id %}"> View Trip for {{trip.start_date}} at {{trip.location}}</a> --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
     {% endfor %}
 </ul>
 {% else %}

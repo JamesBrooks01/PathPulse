@@ -3,6 +3,7 @@
 {% block body %}
 
 {% if trip %}
+<a href="{% url 'path_pulse:detail' user %}">Return to Trip List</a>
 <ul>
     {% for key, value in trip.items %}
     <li>
@@ -15,9 +16,9 @@
 
 </ul>
 
-{{trip}}
 {% else %}
 <p>No Data</p>
+<a href="{% url 'path_pulse:index' %}">Return to Index</a>
 {% endif %}
 
 

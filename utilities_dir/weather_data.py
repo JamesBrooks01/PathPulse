@@ -1,5 +1,6 @@
 import datetime
 from datetime import date
+from datetime import datetime as datetime_object
 import os
 import openmeteo_requests
 import requests_cache
@@ -29,39 +30,58 @@ def location_data(data):
 
 def weather_data(data):
     coords = location_data(data)
-    today = date.today()
-    start_unix = datetime.datetime.fromisoformat(data['start_date'])
-    end_unix = datetime.datetime.fromisoformat(data['end_date'])
-    days_from_today = round((start_unix - today) // 86400)
-    if days_from_today < 0:
-        return 'Invalid Date, Start Date is in the Past'
-    boundry = today + (7 * 86400)
+    start_date_formatted = datetime_object.fromisoformat(data.start_date)
+    end_date_formatted = datetime_object.fromisoformat(data.end_date)
+    start_unix = datetime_object.timestamp(start_date_formatted)
+    end_unix = datetime_object.timestamp(end_date_formatted)
+    today_unix = datetime_object.timestamp(datetime_object.today())
 
-    forecast = []
-    historic = []
+    if start_unix < today_unix:
+        return 'Invalid Date, Start Date is in the Past'
+    
+    boundry = today_unix + (7 * 86400)
+
+    forecast = {}
+    historic = {}
     all_weather = {}
     date_list = []
 
     marker = start_unix
     while marker <= end_unix:
-        date_list.append(marker)
-        marker + 86400
+        date_list.append(str(date.fromtimestamp(marker)))
+        marker += 86400
+
+    lat = coords['lat']
+    lon = coords['lon']
 
     if start_unix >= boundry:
-        historic_weather()
+        historic_weather(lat=lat, lon=lon, date_list=date_list, historic=historic)
     elif end_unix >= boundry:
-        both_weather()
+        both_weather(lat=lat,lon=lon,date_list=date_list,forecast=forecast,historic=historic,boundry=boundry)
     else:
-        forecast_weather()
+        forecast_weather(lat=lat,lon=lon,date_list=date_list,forecast=forecast)
+
+    if forecast == {}:
+        return historic
+    elif historic == {}:
+        return forecast
+    else:
+        all_weather.update(forecast)
+        all_weather.update(historic)
+        return all_weather
 
 
-def historic_weather(lat,lon,start,end):
+def historic_weather(lat,lon,date_list, historic):
     url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
+    start_date_past= datetime_object.fromisoformat(date_list[0]) - datetime.timedelta(366)
+    end_date_past= datetime_object.fromisoformat(date_list[-1]) - datetime.timedelta(366)
+    start_date_formatted = start_date_past.date()
+    end_date_formatted = end_date_past.date()
     params = {
         "latitude": lat,
         "longitude": lon,
-        "start_date": start,
-        "end_date": end,
+        "start_date": start_date_formatted.isoformat(),
+        "end_date": end_date_formatted.isoformat(),
         "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min"],
         "temperature_unit": "fahrenheit",
         "wind_speed_unit": "mph",
@@ -72,22 +92,54 @@ def historic_weather(lat,lon,start,end):
     response = requests.get(url,params=params)
     converted = json.loads(response.text)
     return_data = converted['daily']
-    return_dict = {}
 
-    with open('') as weather_codes:
-        codes = json.load(weather_codes)
 
     for x in range(len(return_data['time'])):
-        return_dict[return_data['time'][x]] = {
-            'code': codes[f"{return_data['weather_code'][x]}"]['description'],
-            'img': codes[f"{return_data['weather_code'][x]}"]['image'],
+        historic[date_list[x]] = {
+            'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
+            'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
             'high': return_data['temperature_2m_max'][x],
             'low': return_data['temperature_2m_min'][x]
         }
-    return return_dict
+    return historic
 
-def forecast_weather():
-    pass
+def forecast_weather(lat,lon,date_list,forecast):
+    url = 'https://api.open-meteo.com/v1/forecast'
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "start_date": date_list[0],
+        "end_date": date_list[-1],
+        "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min"],
+        "temperature_unit": "fahrenheit",
+        "wind_speed_unit": "mph",
+        "precipitation_unit": "inch",
+        "timezone": "auto" 
+    }
+    
+    response = requests.get(url, params=params)
+    converted = json.loads(response.text)
+    return_data = converted['daily']
 
-def both_weather():
-    pass
+    for x in range(len(return_data['time'])):
+        forecast[date_list[x]] = {
+            'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
+            'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
+            'high': return_data['temperature_2m_max'][x],
+            'low': return_data['temperature_2m_min'][x]            
+        }
+    return forecast
+
+def both_weather(lat,lon,date_list,forecast,historic, boundry):
+    forecast_dates = []
+    historic_dates = []
+
+    for date in date_list:
+        date_unix = datetime_object.timestamp(datetime_object.fromisoformat(date))
+        if date_unix >= boundry:
+            historic_dates.append(date)
+        else:
+            forecast_dates.append(date)
+    historic_weather(lat=lat,lon=lon,date_list=historic_dates,historic=historic)
+    forecast_weather(lat=lat,lon=lon,date_list=forecast_dates,forecast=forecast)
+    return
