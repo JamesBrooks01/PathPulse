@@ -30,7 +30,6 @@ def location_data(data):
 
 def weather_data(data):
     coords = location_data(data)
-    today = datetime_object.today()
     start_date_formatted = datetime_object.fromisoformat(data.start_date)
     end_date_formatted = datetime_object.fromisoformat(data.end_date)
     start_unix = datetime_object.timestamp(start_date_formatted)
@@ -52,14 +51,28 @@ def weather_data(data):
         date_list.append(str(date.fromtimestamp(marker)))
         marker += 86400
 
-    if start_unix >= boundry:
-        historic_weather(lat=coords['lat'], lon=coords['lon'], date_list=date_list, historic=historic)
-    elif end_unix >= boundry:
-        both_weather()
-    else:
-        forecast_weather()
+    lat = coords['lat']
+    lon = coords['lon']
 
-    return historic
+    if start_unix >= boundry:
+        print("Historic Hit")
+        historic_weather(lat=lat, lon=lon, date_list=date_list, historic=historic)
+    elif end_unix >= boundry:
+        print("Both Weather Hit")
+        both_weather(lat=lat,lon=lon,date_list=date_list,forecast=forecast,historic=historic,boundry=boundry)
+    else:
+        print("Forecast Hit")
+        forecast_weather(lat=lat,lon=lon,date_list=date_list,forecast=forecast)
+
+    if forecast == {}:
+        return historic
+    elif historic == {}:
+        return forecast
+    else:
+        all_weather.update(forecast)
+        all_weather.update(historic)
+        return all_weather
+
 
 def historic_weather(lat,lon,date_list, historic):
     url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
