@@ -55,13 +55,10 @@ def weather_data(data):
     lon = coords['lon']
 
     if start_unix >= boundry:
-        print("Historic Hit")
         historic_weather(lat=lat, lon=lon, date_list=date_list, historic=historic)
     elif end_unix >= boundry:
-        print("Both Weather Hit")
         both_weather(lat=lat,lon=lon,date_list=date_list,forecast=forecast,historic=historic,boundry=boundry)
     else:
-        print("Forecast Hit")
         forecast_weather(lat=lat,lon=lon,date_list=date_list,forecast=forecast)
 
     if forecast == {}:
