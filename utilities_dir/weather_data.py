@@ -133,5 +133,16 @@ def forecast_weather(lat,lon,date_list,forecast):
         }
     return forecast
 
-def both_weather():
-    pass
+def both_weather(lat,lon,date_list,forecast,historic, boundry):
+    forecast_dates = []
+    historic_dates = []
+
+    for date in date_list:
+        date_unix = datetime_object.timestamp(datetime_object.fromisoformat(date))
+        if date_unix >= boundry:
+            historic_dates.append(date)
+        else:
+            forecast_dates.append(date)
+    historic_weather(lat=lat,lon=lon,date_list=historic_dates,historic=historic)
+    forecast_weather(lat=lat,lon=lon,date_list=forecast_dates,forecast=forecast)
+    return
