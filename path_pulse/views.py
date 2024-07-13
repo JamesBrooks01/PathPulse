@@ -51,6 +51,5 @@ def delete_trip(request, trip_id, user_id):
     
 def trip_print(request, trip_id, user_id):
     trip = get_object_or_404(Trip, pk=trip_id)
-    location = weather_data.location_data(trip)
-    data = weather_data.historic_weather(lat=location['lat'], lon=location['lon'], start=trip.start_date, end=trip.end_date)
+    data = weather_data.weather_data(trip)
     return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id})
