@@ -31,8 +31,8 @@ def location_data(data):
 def weather_data(data):
     coords = location_data(data)
     today = datetime_object.today()
-    start_date_formatted = datetime_object.fromisoformat(data['start_date'])
-    end_date_formatted = datetime_object.fromisoformat(data['end_date'])
+    start_date_formatted = datetime_object.fromisoformat(data.start_date)
+    end_date_formatted = datetime_object.fromisoformat(data.end_date)
     start_unix = datetime_object.timestamp(start_date_formatted)
     end_unix = datetime_object.timestamp(end_date_formatted)
     today_unix = datetime_object.timestamp(datetime_object.today())
@@ -50,7 +50,7 @@ def weather_data(data):
     marker = start_unix
     while marker <= end_unix:
         date_list.append(str(date.fromtimestamp(marker)))
-        marker + 86400
+        marker += 86400
 
     if start_unix >= boundry:
         historic_weather(lat=coords['lat'], lon=coords['lon'], date_list=date_list, historic=historic)
@@ -59,15 +59,19 @@ def weather_data(data):
     else:
         forecast_weather()
 
+    return historic
+
 def historic_weather(lat,lon,date_list, historic):
     url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
-    start_date_past= datetime_object.fromisoformat(date_list[0]) - datetime.timedelta(365)
-    end_date_past= datetime_object.fromisoformat(date_list[-1]) - datetime.timedelta(365)
+    start_date_past= datetime_object.fromisoformat(date_list[0]) - datetime.timedelta(366)
+    end_date_past= datetime_object.fromisoformat(date_list[-1]) - datetime.timedelta(366)
+    start_date_formatted = start_date_past.date()
+    end_date_formatted = end_date_past.date()
     params = {
         "latitude": lat,
         "longitude": lon,
-        "start_date": start_date_past,
-        "end_date": end_date_past,
+        "start_date": start_date_formatted.isoformat(),
+        "end_date": end_date_formatted.isoformat(),
         "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min"],
         "temperature_unit": "fahrenheit",
         "wind_speed_unit": "mph",
@@ -81,7 +85,7 @@ def historic_weather(lat,lon,date_list, historic):
 
 
     for x in range(len(return_data['time'])):
-        historic[return_data['time'][x]] = {
+        historic[date_list[x]] = {
             'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
             'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
             'high': return_data['temperature_2m_max'][x],
