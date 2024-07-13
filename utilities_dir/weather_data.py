@@ -106,8 +106,32 @@ def historic_weather(lat,lon,date_list, historic):
         }
     return historic
 
-def forecast_weather():
-    pass
+def forecast_weather(lat,lon,date_list,forecast):
+    url = 'https://api.open-meteo.com/v1/forecast'
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "start_date": date_list[0],
+        "end_date": date_list[-1],
+        "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min"],
+        "temperature_unit": "fahrenheit",
+        "wind_speed_unit": "mph",
+        "precipitation_unit": "inch",
+        "timezone": "auto" 
+    }
+    
+    response = requests.get(url, params=params)
+    converted = json.loads(response.text)
+    return_data = converted['daily']
+
+    for x in range(len(return_data['time'])):
+        forecast[date_list[x]] = {
+            'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
+            'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
+            'high': return_data['temperature_2m_max'][x],
+            'low': return_data['temperature_2m_min'][x]            
+        }
+    return forecast
 
 def both_weather():
     pass
