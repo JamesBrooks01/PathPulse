@@ -37,7 +37,7 @@ def weather_data(data):
     today_unix = datetime_object.timestamp(datetime_object.today())
 
     if start_unix < today_unix:
-        return 'Invalid Date, Start Date is in the Past'
+        return 'Invalid'
     
     boundry = today_unix + (7 * 86400)
 
