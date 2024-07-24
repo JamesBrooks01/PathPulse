@@ -4,6 +4,9 @@
 
 {% if trip %}
 <a href="{% url 'path_pulse:detail' user %}">Return to Trip List</a>
+{% if trip == "Invalid" %}
+<p>Invalid Date, Start Date is in the Past</p>
+{% else %}
 <ul>
     {% for key, value in trip.items %}
     <li>
@@ -15,6 +18,7 @@
     {% endfor %}
 
 </ul>
+{% endif %}
 
 {% else %}
 <p>No Data</p>
