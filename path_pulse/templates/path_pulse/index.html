@@ -2,18 +2,26 @@
 
 {% block body %}
 
-{% if user %}
-<ul>
-    {% for user in user %}
-    <li><a href="{% url 'path_pulse:detail' user.id %}">View Trips for {{ user }}</a> --- <a href="{% url 'path_pulse:trip' user.id %}">Add a Trip to this User</a></li>
-    {% endfor %}
-</ul>
+{% if session %}
+
+<h1>Welcome {{session.userinfo.name}}!</h1>
+<p><a href="{% url 'path_pulse:logout' %}">Logout</a></p>
+{% if trips %}
+<p>{{trips}}</p>
+{% else %}
+<p>No Trips</p>
+{% endif %}
+
+{% else %}
+
+<h1>Welcome Guest</h1>
+<p><a href="{% url 'path_pulse:login' %}">Login</a></p>
+
+{% endif %}
+
 <footer>
     <a href='https://locationiq.com'>Location Data provided by LocationIQ.com</a><br>
     <a href='https://open-meteo.com'>Weather Data provided by open-metro.com</a>
 </footer>
-{% else %}
-<p>Hello World</p>
-{% endif %}
 
 {% endblock %}
