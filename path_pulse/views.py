@@ -58,18 +58,24 @@ def logout(request):
 
 def index(request):
     data =  request.session.get('user')
-    user_grab = User.objects.filter(user_email=data['userinfo']['email'])
+    trips = None
+    user_grab = None
+    if data:
+        user_grab = get_object_or_404(User, user_email=data['userinfo']['email'])
+        if not user_grab:
+            user = User(user_email=data['userinfo']['email'])
+            user.save()
+            return HttpResponseRedirect(reverse('path_pulse:index'))
+        else:
+            trips = Trip.objects.filter(user=user_grab)
+    # Change this lower line, it is a placeholder to get user_grab[0] to not throw an error.
     if not user_grab:
-        user = User(user_email=data['userinfo']['email'])
-        user.save()
-        return HttpResponseRedirect(reverse('path_pulse:index'))
-    else:
-        trips = Trip.objects.filter(user=user_grab[0])
+        user_grab = ['guest@placeholder.com']
     return render(request,'path_pulse/index.html',
         context={
             'session': data,
             'trips': trips,
-            'user': user_grab[0],
+            'user': user_grab,
                  },
         )
     
