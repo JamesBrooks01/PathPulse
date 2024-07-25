@@ -78,12 +78,7 @@ def index(request):
             'user': user_grab,
                  },
         )
-    
-class DetailView(generic.ListView):
-    template_name = 'path_pulse/detail.html'
-    context_object_name = 'trips'
-    def get_queryset(self):
-        return Trip.objects.filter(user_id = self.kwargs['pk'])
+
     
 class VoteView(generic.ListView):
     model = Trip
