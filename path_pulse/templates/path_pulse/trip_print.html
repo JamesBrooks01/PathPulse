@@ -3,7 +3,7 @@
 {% block body %}
 
 {% if trip %}
-<a href="{% url 'path_pulse:detail' user %}">Return to Trip List</a>
+<a href="{% url 'path_pulse:index' %}">Return to Index</a>
 {% if trip == "Invalid" %}
 <p>Invalid Date, Start Date is in the Past</p>
 {% else %}
