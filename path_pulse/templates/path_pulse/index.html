@@ -1,14 +1,14 @@
 {% extends "path_pulse/base.html" %}
 
 {% block header %}
-    <div>
+    <div class="loginDiv">
         {% if session %}
-            <h2>{{session.userinfo.name}}</h2>
-            <img src="{{ session.userinfo.picture }}" alt="Google User Profile Image">
-            <p><a href="{% url 'path_pulse:logout' %}">Logout</a></p>
+            <h2 class="loginInfo">{{session.userinfo.name}}</h2>
+            <img class="loginInfo" src="{{ session.userinfo.picture }}" alt="Google User Profile Image">
+            <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:logout' %}">Logout</a></p>
         {% else %}
-            <h1>Welcome Guest</h1>
-            <p><a href="{% url 'path_pulse:login' %}">Login</a></p>
+            <h2 class="loginInfo">Welcome Guest</h2>
+            <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:login' %}">Login</a></p>
         {% endif %}
     </div>
 
