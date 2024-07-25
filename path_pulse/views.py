@@ -69,6 +69,7 @@ def index(request):
         context={
             'session': data,
             'trips': trips,
+            'user': user_grab[0],
                  },
         )
     
