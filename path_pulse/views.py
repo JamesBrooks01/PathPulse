@@ -1,32 +1,83 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.views import generic
 from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
+from authlib.integrations.django_client import OAuth
+from django.conf import settings
+from urllib.parse import urlencode, quote_plus
+import json
+
 from .models import User, Trip
 from utilities_dir import weather_data
 
+oauth = OAuth()
+
+oauth.register(
+    'auth0',
+    client_id=settings.AUTH0_CLIENT_ID,
+    client_secret=settings.AUTH0_CLIENT_SECRET,
+    client_kwargs={
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration"
+)
+
 # Create your views here.
 
-class IndexView(generic.ListView):
-    template_name = 'path_pulse/index.html'
-    context_object_name = 'user'
-    def get_queryset(self):
-        return get_list_or_404(User)
-    
-class DetailView(generic.ListView):
-    template_name = 'path_pulse/detail.html'
-    context_object_name = 'trips'
-    def get_queryset(self):
-        return Trip.objects.filter(user_id = self.kwargs['pk'])
-    
-class VoteView(generic.ListView):
-    model = Trip
-    template_name = 'path_pulse/vote.html'
-    context_object_name = 'user'
-    def get_queryset(self):
-        return get_object_or_404(User, pk=self.kwargs['pk'])
+def login(request):
+    return oauth.auth0.authorize_redirect(
+        request, request.build_absolute_uri(reverse('path_pulse:callback'))
+    )
+
+def callback(request):
+    token = oauth.auth0.authorize_access_token(request)
+    request.session['user'] = token
+    return redirect(request.build_absolute_uri(reverse('path_pulse:index')))
+
+def logout(request):
+    request.session.clear()
+
+    return redirect(
+        f'https://{settings.AUTH0_DOMAIN}/v2/logout?'
+        + urlencode(
+            {
+                'returnTo': request.build_absolute_uri(reverse('path_pulse:index')),
+                'client_id': settings.AUTH0_CLIENT_ID,
+            },
+            quote_via=quote_plus,
+        ),
+    )
+
+# class IndexView(generic.ListView):
+#     template_name = 'path_pulse/index.html'
+#     context_object_name = 'user'
+#     def get_queryset(self):
+#         return get_list_or_404(User)
+
+def index(request):
+    data =  request.session.get('user')
+    trips = None
+    user_grab = None
+    if data:
+        user_grab = get_object_or_404(User, user_email=data['userinfo']['email'])
+        if not user_grab:
+            user = User(user_email=data['userinfo']['email'])
+            user.save()
+            return HttpResponseRedirect(reverse('path_pulse:index'))
+        else:
+            trips = Trip.objects.filter(user=user_grab)
+    # Change this lower line, it is a placeholder to get user_grab[0] to not throw an error.
+    if not user_grab:
+        user_grab = ['guest@placeholder.com']
+    return render(request,'path_pulse/index.html',
+        context={
+            'session': data,
+            'trips': trips,
+            'user': user_grab,
+                 },
+        )
     
 def vote(request, user_id):
     user = get_object_or_404(User, pk=user_id)

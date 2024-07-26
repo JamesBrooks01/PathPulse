@@ -1,19 +1,57 @@
 {% extends "path_pulse/base.html" %}
 
+{% block header %}
+    <div class="loginDiv">
+        {% if session %}
+            <h2 class="loginInfo">{{session.userinfo.name}}</h2>
+            <img class="loginInfo" src="{{ session.userinfo.picture }}" alt="Google User Profile Image">
+            <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:logout' %}">Logout</a></p>
+        {% else %}
+            <h2 class="loginInfo">Welcome Guest</h2>
+            <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:login' %}">Login</a></p>
+        {% endif %}
+    </div>
+
+    <h1>Path Pulse</h1>
+
+{% endblock %}
+
 {% block body %}
 
-{% if user %}
-<ul>
-    {% for user in user %}
-    <li><a href="{% url 'path_pulse:detail' user.id %}">View Trips for {{ user }}</a> --- <a href="{% url 'path_pulse:trip' user.id %}">Add a Trip to this User</a></li>
-    {% endfor %}
-</ul>
-<footer>
-    <a href='https://locationiq.com'>Location Data provided by LocationIQ.com</a><br>
-    <a href='https://open-meteo.com'>Weather Data provided by open-metro.com</a>
-</footer>
+{% if session %}
+
+    <div class="tripForm">
+        <form action="{% url 'path_pulse:vote' user.id %}" method="post">
+            {% csrf_token %}
+            <fieldset>
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <input type="text" name="location">Location
+                <input type="date" name="start_date">Start Date
+                <input type="date" name="end_date">End Date
+            </fieldset>
+            <input type="submit" value="Vote">
+        </form>
+    </div>
+
+    {% if trips %}
+            <ul class="tripBox">
+                {% for trip in trips %}
+                <div class="tripItem">
+                    <li><a href="{% url 'path_pulse:print_test' trip.id trip.user_id %}"> View Trip for {{trip.start_date}} at {{trip.location}}</a> --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
+                 </div>
+                {% endfor %}
+            </ul>
+    {% else %}
+
+        <p>No Trips</p>
+
+    {% endif %}
+    
+
 {% else %}
-<p>Hello World</p>
+
+    <p class="guestWarning">You are currently logged in as a guest. As of current, you will not be able to interact with the website due to the way it handles data. Thank You for visiting.</p>
+
 {% endif %}
 
 {% endblock %}

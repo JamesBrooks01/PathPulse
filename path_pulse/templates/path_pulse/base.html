@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 
 <html lang="en">
     <head>
         <meta name="viewport" content="initial-scale=1" width="device-width">
-        <link rel="stylesheet" href="../../../static/style.css">
         <title>Path Pulse</title>
+        <link rel="stylesheet" href="{% static 'style.css' %}">
         {% block head %}{% endblock %}
     </head>
     <header>
@@ -13,4 +14,16 @@
     <body>
         {% block body %}{% endblock %}
     </body>
+    <footer>
+        <div>
+            <br>Location Data provided by <a href='https://locationiq.com'>LocationIQ.com</a>  
+        </div>
+        <div>
+            <br>Weather Data provided by <a href='https://open-meteo.com'>open-metro.com</a>
+        </div>
+        <div>
+            <br>Find me on <a href="https://github.com/JamesBrooks01">GitHub</a>
+        </div>
+        <br>© 2024
+    </footer>
 </html>
