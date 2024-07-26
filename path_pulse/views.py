@@ -78,14 +78,6 @@ def index(request):
             'user': user_grab,
                  },
         )
-
-    
-class VoteView(generic.ListView):
-    model = Trip
-    template_name = 'path_pulse/vote.html'
-    context_object_name = 'user'
-    def get_queryset(self):
-        return get_object_or_404(User, pk=self.kwargs['pk'])
     
 def vote(request, user_id):
     user = get_object_or_404(User, pk=user_id)

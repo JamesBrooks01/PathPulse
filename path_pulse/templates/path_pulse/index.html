@@ -28,7 +28,18 @@
             {% endfor %}
         </ul>
 
-    <a href="{% url 'path_pulse:trip' user.id %}">Add a New Trip</a>
+        <div class="tripForm">
+            <form action="{% url 'path_pulse:vote' user.id %}" method="post">
+                {% csrf_token %}
+                <fieldset>
+                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                    <input type="text" name="location">Location
+                    <input type="date" name="start_date">Start Date
+                    <input type="date" name="end_date">End Date
+                </fieldset>
+                <input type="submit" value="Vote">
+            </form>
+        </div>
     {% else %}
 
         <p>No Trips</p>
