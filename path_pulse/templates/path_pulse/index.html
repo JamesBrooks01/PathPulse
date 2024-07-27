@@ -37,7 +37,14 @@
             <ul class="tripBox">
                 {% for trip in trips %}
                 <div class="tripItem">
-                    <li><a href="{% url 'path_pulse:print_test' trip.id trip.user_id %}"> View Trip for {{trip.start_date}} at {{trip.location}}</a> --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
+                    
+                    <li>Location: {{trip.location}}</li>
+                    <li>Start Date: {{trip.start_date}}</li>
+                    <li>End Date: {{trip.end_date}}</li>
+                    <div>
+                        <a class="tripButton" href="{% url 'path_pulse:print_test' trip.id trip.user_id %}">View Trip</a>
+                        <a class="tripButton" href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a>
+                    </div>
                  </div>
                 {% endfor %}
             </ul>
