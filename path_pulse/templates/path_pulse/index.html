@@ -24,8 +24,14 @@
         <form action="{% url 'path_pulse:vote' user.id %}" method="post">
             {% csrf_token %}
             <fieldset>
+                <legend>Trip Location</legend>
+                <input type="text" name="city">City
+                <input type="text" name="state">State
+                <input type="text" name="country">Country
+            </fieldset>
+            <fieldset>
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                <input type="text" name="location">Location
+                <legend>Trip Date</legend>
                 <input type="date" name="start_date">Start Date
                 <input type="date" name="end_date">End Date
             </fieldset>
