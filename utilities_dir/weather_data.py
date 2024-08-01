@@ -19,7 +19,7 @@ with open('utilities_dir/weather_codes.json') as weather_file:
 def location_data(data):
     sanitized_spaces = data.location.replace(' ', '%20')
     api_key = os.environ.get('LOCATION_API')
-    url = f'https://us1.locationiq.com/v1/search?key={api_key}&q={sanitized_spaces}&format=json'
+    url = f'https://us1.locationiq.com/v1/search/structured?city={sanitized_spaces.city}&state={sanitized_spaces.state}&country={sanitized_spaces.country}&key={api_key}&format=json'
     response = requests.get(url)
     converted = json.loads(response.text)
     return_dict = {
