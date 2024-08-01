@@ -1,15 +1,26 @@
 {% load static %}
-<!DOCTYPE html>
 
 <html lang="en">
     <head>
         <meta name="viewport" content="initial-scale=1" width="device-width">
         <title>Path Pulse</title>
+        <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
         <link rel="stylesheet" href="{% static 'style.css' %}">
         {% block head %}{% endblock %}
     </head>
     <header>
+        <div class="loginDiv">
+            {% if session %}
+                <h2 class="loginInfo">{{session.userinfo.name}}</h2>
+                <img class="loginInfo" src="{{ session.userinfo.picture }}" alt="Google User Profile Image">
+                <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:logout' %}">Logout</a></p>
+            {% else %}
+                <h2 class="loginInfo">Welcome Guest</h2>
+                <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:login' %}">Login</a></p>
+            {% endif %}
+        </div>
         {% block header %}{% endblock %}
+        <h1>Path Pulse</h1>
     </header>
     <body>
         {% block body %}{% endblock %}
