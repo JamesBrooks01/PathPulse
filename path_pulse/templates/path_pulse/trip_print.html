@@ -1,28 +1,38 @@
 {% extends "path_pulse/base.html" %}
 
+
 {% block body %}
 
+<a class="indexReturn" href="{% url 'path_pulse:index' %}">Return to Index</a>
+
 {% if trip %}
-<a href="{% url 'path_pulse:index' %}">Return to Index</a>
-{% if trip == "Invalid" %}
-<p>Invalid Date, Start Date is in the Past</p>
-{% else %}
-<ul>
-    {% for key, value in trip.items %}
-    <li>
-        On {{key}}, the Weather should be {{value.code}} with a High of {{value.high}} and a Low of {{value.low}}
-    </li>
-    <li>
-        <img id="weatherImg" src='{{value.img}}'>
-    </li>
-    {% endfor %}
+    {% if trip == "Invalid" %}
+        <p>Invalid Date, Start Date is likely in the Past</p>
+    {% else %}
+        <h2>Trip to {{object.city}} {{object.state}}, {{object.country}}</h2>
+        <h2>From {{object.start_date}} to {{object.end_date}}</h2>
+        <div style="display: flex; margin-right: 5%; margin-left: 5%;">
+            <div class="weatherBox">
+                {% for key, value in trip.items %}
+                <div class="weatherItem">
+                    <p class="weatherText">{{key}}</p>
+                    <img class="weatherImg" src='{{value.img}}'>
+                    <p class="weatherText">The Weather should be {{value.code}}</p>
+                    <div class="tempDiv">
+                        <img src="../../../static/arrow-145783.svg" style="width: clamp(12px, 4vw, 18px); height: clamp(12px, 4vw, 18px);"> {{value.high}}° F
+                        <img src="../../../static/download-1292814.svg" style="width: clamp(12px, 4vw, 18px); height: clamp(12px, 4vw, 18px);"> {{value.low}}° F
+                    </div>
+                </div>
 
-</ul>
-{% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+    {% endif %}
 
 {% else %}
-<p>No Data</p>
-<a href="{% url 'path_pulse:index' %}">Return to Index</a>
+    <p>No Data</p>
+    <a href="{% url 'path_pulse:index' %}">Return to Index</a>
 {% endif %}
 
 

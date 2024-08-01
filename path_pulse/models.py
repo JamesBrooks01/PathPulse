@@ -10,9 +10,11 @@ class User(models.Model):
     
 class Trip(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    location = models.CharField(max_length=200)
+    city = models.CharField(max_length=200)
+    state = models.CharField(max_length=200)
+    country = models.CharField(max_length=200)
     start_date = models.CharField(max_length=200)
     end_date = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.location} - {self.start_date} - {self.end_date}"
+        return f"Trip to {self.city}, {self.city}, {self.country}. It starts on {self.start_date} and ends on {self.end_date}"

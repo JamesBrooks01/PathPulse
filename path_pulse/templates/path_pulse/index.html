@@ -1,49 +1,44 @@
 {% extends "path_pulse/base.html" %}
 
-{% block header %}
-    <div class="loginDiv">
-        {% if session %}
-            <h2 class="loginInfo">{{session.userinfo.name}}</h2>
-            <img class="loginInfo" src="{{ session.userinfo.picture }}" alt="Google User Profile Image">
-            <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:logout' %}">Logout</a></p>
-        {% else %}
-            <h2 class="loginInfo">Welcome Guest</h2>
-            <p class="loginInfo"><a class="logButton" href="{% url 'path_pulse:login' %}">Login</a></p>
-        {% endif %}
-    </div>
-
-    <h1>Path Pulse</h1>
-
-{% endblock %}
-
 {% block body %}
 
 {% if session %}
-
-    <div class="tripForm">
-        <form action="{% url 'path_pulse:vote' user.id %}" method="post">
-            {% csrf_token %}
-            <fieldset>
-                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                <input type="text" name="location">Location
-                <input type="date" name="start_date">Start Date
-                <input type="date" name="end_date">End Date
-            </fieldset>
-            <input type="submit" value="Vote">
-        </form>
+    <div style="display: flex;">
+        <div class="tripForm">
+            <form action="{% url 'path_pulse:vote' user.id %}" method="post">
+                {% csrf_token %}
+                <fieldset class="locationForm">
+                    <legend>Trip Location</legend>
+                    <input type="text" name="city">City
+                    <input type="text" name="state">State
+                    <input type="text" name="country">Country
+                </fieldset>
+                <fieldset class="dateForm">
+                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                    <legend>Trip Date</legend>
+                    <input type="date" name="start_date">Start Date
+                    <input type="date" name="end_date">End Date
+                </fieldset>
+                <input class="submitButton" type="submit" value="Vote">
+            </form>
+        </div>
     </div>
 
     {% if trips %}
             <ul class="tripBox">
                 {% for trip in trips %}
                 <div class="tripItem">
-                    <li><a href="{% url 'path_pulse:print_test' trip.id trip.user_id %}"> View Trip for {{trip.start_date}} at {{trip.location}}</a> --- <a href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete Trip</a></li>
+                    
+                    <li>Location: {{trip.city}} {{trip.state}}, {{trip.country}}</li>
+                    <li>Start Date: {{trip.start_date}}</li>
+                    <li>End Date: {{trip.end_date}}</li>
+                    <div class="tripButtonDiv">
+                        <a class="tripButton" href="{% url 'path_pulse:print_test' trip.id trip.user_id %}">View</a>
+                        <a class="tripButton" href="{% url 'path_pulse:delete_trip' trip.id trip.user_id %}">Delete</a>
+                    </div>
                  </div>
                 {% endfor %}
             </ul>
-    {% else %}
-
-        <p>No Trips</p>
 
     {% endif %}
     

@@ -83,7 +83,13 @@ def vote(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     try:
         form_data = request.POST
-        trip = Trip(user=user, location=form_data['location'], start_date=form_data['start_date'], end_date=form_data['end_date'])
+        trip = Trip()
+        trip.user = user
+        trip.city = form_data['city']
+        trip.state = form_data['state']
+        trip.country = form_data['country']
+        trip.start_date = form_data['start_date']
+        trip.end_date = form_data['end_date']
     except (KeyError, user.DoesNotExist):
         return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Please provide trip information",},)
     else:
@@ -103,4 +109,4 @@ def delete_trip(request, trip_id, user_id):
 def trip_print(request, trip_id, user_id):
     trip = get_object_or_404(Trip, pk=trip_id)
     data = weather_data.weather_data(trip)
-    return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id})
+    return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id, 'object': trip})

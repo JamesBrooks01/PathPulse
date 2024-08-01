@@ -17,9 +17,8 @@ with open('utilities_dir/weather_codes.json') as weather_file:
 
 
 def location_data(data):
-    sanitized_spaces = data.location.replace(' ', '%20')
     api_key = os.environ.get('LOCATION_API')
-    url = f'https://us1.locationiq.com/v1/search?key={api_key}&q={sanitized_spaces}&format=json'
+    url = f'https://us1.locationiq.com/v1/search/structured?city={data.city}&state={data.state}&country={data.country}&key={api_key}&format=json'
     response = requests.get(url)
     converted = json.loads(response.text)
     return_dict = {
@@ -95,7 +94,8 @@ def historic_weather(lat,lon,date_list, historic):
 
 
     for x in range(len(return_data['time'])):
-        historic[date_list[x]] = {
+        date = date_format(date_list[x])
+        historic[date] = {
             'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
             'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
             'high': return_data['temperature_2m_max'][x],
@@ -122,7 +122,8 @@ def forecast_weather(lat,lon,date_list,forecast):
     return_data = converted['daily']
 
     for x in range(len(return_data['time'])):
-        forecast[date_list[x]] = {
+        date = date_format(date_list[x])
+        forecast[date] = {
             'code': weather_codes[f"{return_data['weather_code'][x]}"]['description'],
             'img': weather_codes[f"{return_data['weather_code'][x]}"]['image'],
             'high': return_data['temperature_2m_max'][x],
@@ -143,3 +144,23 @@ def both_weather(lat,lon,date_list,forecast,historic, boundry):
     historic_weather(lat=lat,lon=lon,date_list=historic_dates,historic=historic)
     forecast_weather(lat=lat,lon=lon,date_list=forecast_dates,forecast=forecast)
     return
+
+def date_format(date):
+    days_of_week = {'0': 'Monday','1': 'Tuesday','2': 'Wednesday','3': 'Thursday','4': 'Friday','5': 'Saturday','6': 'Sunday'}
+    months = {'1': 'January','2': 'February','3': 'March','4': 'April','5': 'May','6': 'June','7': 'July','8': 'August','9': 'September','10': 'October','11': 'November','12': 'December'}
+    formatted_date = datetime_object.fromisoformat(date)
+    weekday = days_of_week[f'{formatted_date.weekday()}']
+    day = str(formatted_date.day)
+    day_string = ''
+    if day[-1] == '2':
+        day_string += f'{day}nd'
+    elif day[-1] == '3':
+        day_string += f'{day}rd'  
+    elif day[-1] in ['1']:
+        day_string += f'{day}st'
+    else:
+        day_string += f'{day}th'
+    month = months[f'{formatted_date.month}']
+    year = formatted_date.year
+    complete_string = f"{weekday}, The {day_string} of {month}, {year}"
+    return complete_string
