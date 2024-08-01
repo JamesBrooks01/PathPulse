@@ -109,4 +109,4 @@ def delete_trip(request, trip_id, user_id):
 def trip_print(request, trip_id, user_id):
     trip = get_object_or_404(Trip, pk=trip_id)
     data = weather_data.weather_data(trip)
-    return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id})
+    return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id, 'object': trip})
