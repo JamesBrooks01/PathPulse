@@ -99,6 +99,14 @@ DATABASES = {
     }
 }
 
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'test_sqlite3_django',
+        'USER': os.environ.get('TEST_DB_USER'),
+        'PASSWORD': os.environ.get('TEST_DB_PASSWORD')
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
