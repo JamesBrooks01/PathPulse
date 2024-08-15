@@ -1,13 +1,10 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
-from django.views import generic
-from django.db.models import F
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
 from urllib.parse import urlencode, quote_plus
-import json
 
 from .models import User, Trip
 from utilities_dir import weather_data
@@ -23,8 +20,6 @@ oauth.register(
     },
     server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration"
 )
-
-# Create your views here.
 
 def login(request):
     return oauth.auth0.authorize_redirect(
@@ -49,12 +44,6 @@ def logout(request):
             quote_via=quote_plus,
         ),
     )
-
-# class IndexView(generic.ListView):
-#     template_name = 'path_pulse/index.html'
-#     context_object_name = 'user'
-#     def get_queryset(self):
-#         return get_list_or_404(User)
 
 def index(request):
     data =  request.session.get('user')
