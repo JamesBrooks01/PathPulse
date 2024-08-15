@@ -68,9 +68,6 @@ def index(request):
             return HttpResponseRedirect(reverse('path_pulse:index'))
         else:
             trips = Trip.objects.filter(user=user_grab)
-    # Change this lower line, it is a placeholder to get user_grab[0] to not throw an error.
-    if not user_grab:
-        user_grab = ['guest@placeholder.com']
     return render(request,'path_pulse/index.html',
         context={
             'session': data,
@@ -108,5 +105,15 @@ def delete_trip(request, trip_id, user_id):
     
 def trip_print(request, trip_id, user_id):
     trip = get_object_or_404(Trip, pk=trip_id)
-    data = weather_data.weather_data(trip)
-    return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id, 'object': trip})
+    if trip:
+        logged_in_user = request.session.get('user')
+        if logged_in_user:
+            if trip.user.user_email == logged_in_user['userinfo']['email']:
+                data = weather_data.weather_data(trip)
+                return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id, 'object': trip})
+            else:
+                return HttpResponseRedirect(reverse('path_pulse:index'))
+        else:
+            return HttpResponseRedirect(reverse('path_pulse:index'))
+    else:
+        return HttpResponseRedirect(reverse('path_pulse:index'))
