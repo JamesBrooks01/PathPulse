@@ -88,7 +88,8 @@ def delete_trip(request, trip_id, user_id):
     try:
         trip.delete()
     except(KeyError, trip.DoesNotExist, user.id != trip.user_id):
-        return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Trip does not Exist",},)
+            logged_in_user = request.session.get('user')
+            return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Trip does not Exist"})
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
@@ -101,7 +102,7 @@ def trip_print(request, trip_id, user_id):
                 data = weather_data.weather_data(trip)
                 return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id, 'object': trip})
             else:
-                return HttpResponseRedirect(reverse('path_pulse:index'))
+                return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Authentication Failed. The currently logged in user doesn't match with the user assosiated with the requested trip. If you believe this is in error, please contact the Developer."})
         else:
             return HttpResponseRedirect(reverse('path_pulse:index'))
     else:
