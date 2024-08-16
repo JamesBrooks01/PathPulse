@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
 
 from authlib.integrations.django_client import OAuth
@@ -50,8 +50,9 @@ def index(request):
     trips = None
     user_grab = None
     if data:
-        user_grab = get_object_or_404(User, user_email=data['userinfo']['email'])
-        if not user_grab:
+        try:
+            user_grab = get_object_or_404(User, user_email=data['userinfo']['email'])
+        except (Http404):
             user = User(user_email=data['userinfo']['email'])
             user.save()
             return HttpResponseRedirect(reverse('path_pulse:index'))
