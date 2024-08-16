@@ -29,3 +29,29 @@ class IndexInitialUserTests(TestCase):
         self.assertEqual(response_attempt2.status_code, 200)
         self.assertContains(response_attempt2, 'Trip Location')
 
+class IndexViewTest(TestCase):
+    def  setUp(self):
+        session = self.client.session
+        session['user'] = {'userinfo': {"email": test_email, 'name': 'TestUser', 'picture': 'https://cdn.pixabay.com/photo/2017/11/10/05/46/group-2935521_1280.png'}}
+        session.save()
+        User.objects.create(user_email=test_email)
+
+    def test_no_trips(self):
+        response = self.client.get(reverse('path_pulse:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Trip Location')
+
+    def test_1_trip(self):
+        user = User.objects.get(user_email= test_email)
+        Trip.objects.create(
+            user= user,
+            city= test_city,
+            state= test_state,
+            country= test_country,
+            start_date= test_start_date,
+            end_date= test_end_date,
+        )
+        response = self.client.get(reverse('path_pulse:index'))
+        self.assertContains(response, 'Location:')
+        self.assertContains(response, 'Start Date:')
+        self.assertContains(response, 'End Date:')
