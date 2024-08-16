@@ -67,20 +67,32 @@ def index(request):
         )
     
 def vote(request, user_id):
-    user = get_object_or_404(User, pk=user_id)
-    try:
-        form_data = request.POST
-        trip = Trip()
-        trip.user = user
-        trip.city = form_data['city']
-        trip.state = form_data['state']
-        trip.country = form_data['country']
-        trip.start_date = form_data['start_date']
-        trip.end_date = form_data['end_date']
-    except (KeyError, user.DoesNotExist):
-        return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Please provide trip information",},)
+    logged_in_user = request.session.get('user')
+    if logged_in_user:
+        try:
+            db_user = get_object_or_404(User, user_email= logged_in_user['userinfo']['email'])
+        except(Http404):
+            return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Authentication Failed. User does not exist in the database. If you believe this is in error, please contact the Developer."})
+        else:
+            if db_user.id != user_id:
+                return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Authentication Failed. The currently logged in user doesn't match with the user provided in the request. If you believe this is in error, please contact the Developer."})
+            else:
+                user = db_user
+                try:
+                    form_data = request.POST
+                    trip = Trip()
+                    trip.user = user
+                    trip.city = form_data['city']
+                    trip.state = form_data['state']
+                    trip.country = form_data['country']
+                    trip.start_date = form_data['start_date']
+                    trip.end_date = form_data['end_date']
+                except (KeyError, user.DoesNotExist):
+                    return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Please provide trip information",},)
+                else:
+                    trip.save()
+                    return HttpResponseRedirect(reverse('path_pulse:index'))
     else:
-        trip.save()
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
 def delete_trip(request, trip_id, user_id):
@@ -101,7 +113,7 @@ def trip_print(request, trip_id, user_id):
         if logged_in_user:
             if trip.user.user_email == logged_in_user['userinfo']['email']:
                 data = weather_data.weather_data(trip)
-                return render(request,'path_pulse/trip_print.html', {'trip': data, 'user': user_id, 'object': trip})
+                return render(request,'path_pulse/trip_print.html', {'session': logged_in_user, 'trip': data, 'user': user_id, 'object': trip})
             else:
                 return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Authentication Failed. The currently logged in user doesn't match with the user assosiated with the requested trip. If you believe this is in error, please contact the Developer."})
         else:
