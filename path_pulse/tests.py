@@ -42,4 +42,8 @@ class TripTestCase(TestCase):
         self.assertIn(test_start_date, trip_string)
         self.assertIn(test_end_date, trip_string)
 
-    
+class IndexGuestViewTests(TestCase):
+    def test_guest_visit(self):
+        response = self.client.get(reverse('path_pulse:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'You are currently logged in as a guest.')
