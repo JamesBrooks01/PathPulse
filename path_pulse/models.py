@@ -17,4 +17,4 @@ class Trip(models.Model):
     end_date = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"Trip to {self.city}, {self.city}, {self.country}. It starts on {self.start_date} and ends on {self.end_date}"
+        return f"Trip to {self.city}, {self.state}, {self.country}. It starts on {self.start_date} and ends on {self.end_date}"

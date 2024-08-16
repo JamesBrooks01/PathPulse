@@ -9,9 +9,12 @@
                 {% csrf_token %}
                 <fieldset class="locationForm">
                     <legend>Trip Location</legend>
-                    <input type="text" name="city">City
-                    <input type="text" name="state">State
-                    <input type="text" name="country">Country
+                    <label for="city">City</label>
+                    <input type="text" name="city">
+                    <label for="state">State</label>
+                    <input type="text" name="state">
+                    <label for="country">Country</label>
+                    <input type="text" name="country">
                 </fieldset>
                 <fieldset class="dateForm">
                     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}

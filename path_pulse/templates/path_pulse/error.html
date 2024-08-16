@@ -1,0 +1,13 @@
+{% extends "path_pulse/base.html" %}
+
+{% block body %}
+
+<a class="indexReturn" href="{% url 'path_pulse:index' %}">Return to Index</a>
+
+{% if error_message %}
+
+    <p>{{error_message}}</p>
+
+{% endif %}
+
+{% endblock %}
