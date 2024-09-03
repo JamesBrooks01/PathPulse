@@ -60,3 +60,13 @@ class VoteViewNoUserTest(TestCase):
     def test_no_user_redirect(self):
         redirect_response = self.client.get(reverse('path_pulse:vote', kwargs={'user_id': 0}))
         self.assertRedirects(redirect_response,  reverse('path_pulse:index'))
+
+class VoteViewUserDoesNotExistTest(TestCase):
+    def  setUp(self):
+        session = self.client.session
+        session['user'] = {'userinfo': {"email": test_email, 'name': 'TestUser', 'picture': 'https://cdn.pixabay.com/photo/2017/11/10/05/46/group-2935521_1280.png'}}
+        session.save()
+
+    def test_user_logged_but_not_in_database(self):
+        response = self.client.get(reverse('path_pulse:vote', kwargs={'user_id': 0}))
+        self.assertContains(response, "User does not exist in the database")
