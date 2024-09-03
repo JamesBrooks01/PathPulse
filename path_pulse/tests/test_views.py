@@ -55,3 +55,8 @@ class IndexViewTest(TestCase):
         self.assertContains(response, 'Location:')
         self.assertContains(response, 'Start Date:')
         self.assertContains(response, 'End Date:')
+
+class VoteViewNoUserTest(TestCase):
+    def test_no_user_redirect(self):
+        redirect_response = self.client.get(reverse('path_pulse:vote', kwargs={'user_id': 0}))
+        self.assertRedirects(redirect_response,  reverse('path_pulse:index'))
