@@ -70,3 +70,28 @@ class VoteViewUserDoesNotExistTest(TestCase):
     def test_user_logged_but_not_in_database(self):
         response = self.client.get(reverse('path_pulse:vote', kwargs={'user_id': 0}))
         self.assertContains(response, "User does not exist in the database")
+
+class VoteViewTests(TestCase):
+    def  setUp(self):
+        session = self.client.session
+        session['user'] = {'userinfo': {"email": test_email, 'name': 'TestUser', 'picture': 'https://cdn.pixabay.com/photo/2017/11/10/05/46/group-2935521_1280.png'}}
+        session.save()
+        User.objects.create(user_email=test_email)
+
+    def test_userid_not_same_as_db_userid(self):
+        response = self.client.get(reverse('path_pulse:vote', kwargs={'user_id': 0}))
+        self.assertContains(response, "The currently logged in user")
+
+    def test_intended_path(self):
+        user = User.objects.get(user_email= test_email)
+        path = reverse('path_pulse:vote', kwargs={'user_id': user.id})
+        data = {'city': test_city, 'state': test_state, 'country': test_country, 'start_date': test_start_date, 'end_date': test_end_date}
+        response = self.client.post(path=path, data=data)
+        self.assertRedirects(response, reverse('path_pulse:index'))
+
+    def test_incomplete_form(self):
+        user = User.objects.get(user_email= test_email)
+        path = reverse('path_pulse:vote', kwargs={'user_id': user.id})
+        data = {'city': test_city, 'state': test_state, 'country': test_country, 'start_date': test_start_date}
+        response = self.client.post(path=path, data=data)
+        self.assertContains(response, "An Error has occurred")
