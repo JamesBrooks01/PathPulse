@@ -88,7 +88,7 @@ def vote(request, user_id):
                     trip.start_date = form_data['start_date']
                     trip.end_date = form_data['end_date']
                 except (KeyError, user.DoesNotExist):
-                    return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Please provide trip information",},)
+                    return render(request,'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has occurred. The most likely culprit is an incomplete form. If you believe this is wrong, please contact the Developer.",},)
                 else:
                     trip.save()
                     return HttpResponseRedirect(reverse('path_pulse:index'))
