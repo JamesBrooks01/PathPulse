@@ -96,13 +96,19 @@ def vote(request, user_id):
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
 def delete_trip(request, trip_id):
-    trip = get_object_or_404(Trip, pk=trip_id)
     logged_in_user = request.session.get('user')
-    user = get_object_or_404(User, user_email=logged_in_user['userinfo']['email'])
-    try:
-        trip.delete()
-    except(KeyError, trip.DoesNotExist, user.id != trip.user_id):
-            return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has occurred. Either the Trip does not exist Or this action is unauthorized via the user id assosiated with the trip does not match the logged in user"})
+    if logged_in_user:
+        try:
+            trip = get_object_or_404(Trip, pk=trip_id)
+            user = get_object_or_404(User, user_email=logged_in_user['userinfo']['email'])
+        except(Http404):
+            return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has occurred. Either the Trip or User does not Exist. If you believe this is wrong, please contact the Developer."})
+        else:
+            if user.id == trip.user_id:
+                trip.delete()
+                return HttpResponseRedirect(reverse('path_pulse:index'))
+            else:
+                return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has occurred. Either the Trip does not exist Or this action is unauthorized via the user id assosiated with the trip does not match the logged in user"})  
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
