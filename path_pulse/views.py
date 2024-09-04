@@ -113,16 +113,17 @@ def delete_trip(request, trip_id):
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
 def trip_print(request, trip_id, user_id):
-    trip = get_object_or_404(Trip, pk=trip_id)
-    if trip:
-        logged_in_user = request.session.get('user')
-        if logged_in_user:
+    logged_in_user = request.session.get('user')
+    if logged_in_user:
+        try:
+            trip = get_object_or_404(Trip, pk=trip_id)
+        except(Http404):
+                return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has Occurred. The requested trip does not Exist. If you believe this is in error, please contact the Developer."})   
+        else:
             if trip.user.user_email == logged_in_user['userinfo']['email']:
                 data = weather_data.weather_data(trip)
                 return render(request,'path_pulse/trip_print.html', {'session': logged_in_user, 'trip': data, 'user': user_id, 'object': trip})
             else:
                 return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Authentication Failed. The currently logged in user doesn't match with the user assosiated with the requested trip. If you believe this is in error, please contact the Developer."})
-        else:
-            return HttpResponseRedirect(reverse('path_pulse:index'))
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
