@@ -95,3 +95,52 @@ class VoteViewTests(TestCase):
         data = {'city': test_city, 'state': test_state, 'country': test_country, 'start_date': test_start_date}
         response = self.client.post(path=path, data=data)
         self.assertContains(response, "An Error has occurred")
+
+class DeleteTripTestNoUser(TestCase):
+    def test_no_logged_in_user(self):
+        path = reverse('path_pulse:delete_trip', kwargs={'trip_id': 1})
+        response = self.client.get(path=path)
+        self.assertRedirects(response, reverse('path_pulse:index'))
+
+class DeleteTripTest(TestCase):
+    def  setUp(self):
+        session = self.client.session
+        session['user'] = {'userinfo': {"email": test_email, 'name': 'TestUser', 'picture': 'https://cdn.pixabay.com/photo/2017/11/10/05/46/group-2935521_1280.png'}}
+        session.save()
+        User.objects.create(user_email=test_email)
+        user = User.objects.get(user_email= test_email)
+        path = reverse('path_pulse:vote', kwargs={'user_id': user.id})
+        data = {'city': test_city, 'state': test_state, 'country': test_country, 'start_date': test_start_date, 'end_date': test_end_date}
+        self.client.post(path=path, data=data)
+
+    def test_intended_path(self):
+        user = User.objects.get(user_email= test_email)
+        trip = Trip.objects.get(user=user)
+        path = reverse('path_pulse:delete_trip', kwargs={'trip_id': trip.id})
+        response = self.client.get(path=path)
+        self.assertRedirects(response, reverse('path_pulse:index'))
+
+    def test_trip_does_not_exist(self):
+        user = User.objects.get(user_email= test_email)
+        trip = Trip.objects.get(user=user)
+        adjusted_trip_id = trip.id + 1
+        path = reverse('path_pulse:delete_trip', kwargs={'trip_id': adjusted_trip_id})
+        response = self.client.get(path=path)
+        self.assertContains(response, "Either the Trip or User does not Exist")
+    
+    def test_trip_and_user_different_ids(self):
+        User.objects.create(user_email="user2@email.com")
+        user = User.objects.get(user_email= "user2@email.com")
+        Trip.objects.create(
+            user= user,
+            city= test_city,
+            state= test_state,
+            country= test_country,
+            start_date= test_start_date,
+            end_date= test_end_date,
+        )
+
+        trip = Trip.objects.get(user=user)
+        delete_path = reverse('path_pulse:delete_trip', kwargs={'trip_id': trip.id})
+        response = self.client.get(path=delete_path)
+        self.assertContains(response, "action is unauthorized")
