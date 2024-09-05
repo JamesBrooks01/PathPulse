@@ -112,7 +112,7 @@ def delete_trip(request, trip_id):
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
-def trip_print(request, trip_id, user_id):
+def trip_print(request, trip_id):
     logged_in_user = request.session.get('user')
     if logged_in_user:
         try:
@@ -122,7 +122,7 @@ def trip_print(request, trip_id, user_id):
         else:
             if trip.user.user_email == logged_in_user['userinfo']['email']:
                 data = weather_data.weather_data(trip)
-                return render(request,'path_pulse/trip_print.html', {'session': logged_in_user, 'trip': data, 'user': user_id, 'object': trip})
+                return render(request,'path_pulse/trip_print.html', {'session': logged_in_user, 'trip': data, 'object': trip})
             else:
                 return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Authentication Failed. The currently logged in user doesn't match with the user assosiated with the requested trip. If you believe this is in error, please contact the Developer."})
     else:

@@ -36,7 +36,7 @@
                     <li>Start Date: {{trip.start_date}}</li>
                     <li>End Date: {{trip.end_date}}</li>
                     <div class="tripButtonDiv">
-                        <a class="tripButton" href="{% url 'path_pulse:print_test' trip.id trip.user_id %}">View</a>
+                        <a class="tripButton" href="{% url 'path_pulse:print_test' trip.id %}">View</a>
                         <a class="tripButton" href="{% url 'path_pulse:delete_trip' trip.id %}">Delete</a>
                     </div>
                  </div>
