@@ -195,6 +195,72 @@ class TripPrintTest(TestCase):
         )
 
         trip = Trip.objects.get(user=user)
-        delete_path = reverse('path_pulse:print_test', kwargs={'trip_id': trip.id})
-        response = self.client.get(path=delete_path)
+        print_path = reverse('path_pulse:print_test', kwargs={'trip_id': trip.id})
+        response = self.client.get(path=print_path)
         self.assertContains(response, "match with the user assosiated")
+
+    def test_invalid_start_day(self):
+        user = User.objects.get(user_email= test_email)
+        previous_trip = Trip.objects.get(user=user)
+        delete_path = reverse('path_pulse:delete_trip', kwargs={'trip_id': previous_trip.id})
+        self.client.get(path=delete_path)
+        today = date.today()
+        start_object  = today - datetime.timedelta(5)
+        end_object = today + datetime.timedelta(2)
+        Trip.objects.create(
+            user= user,
+            city= test_city,
+            state= test_state,
+            country= test_country,
+            start_date= start_object.isoformat(),
+            end_date= end_object.isoformat(),
+        )
+
+        trip = Trip.objects.get(user=user)
+        print_path = reverse('path_pulse:print_test', kwargs={'trip_id': trip.id})
+        response = self.client.get(path=print_path)
+        self.assertContains(response, "Start Date is likely in the Past") 
+
+    def test_forecast_weather_dates(self):
+        user = User.objects.get(user_email= test_email)
+        previous_trip = Trip.objects.get(user=user)
+        delete_path = reverse('path_pulse:delete_trip', kwargs={'trip_id': previous_trip.id})
+        self.client.get(path=delete_path)
+        today = date.today()
+        start_object  = today + datetime.timedelta(1)
+        end_object = today + datetime.timedelta(3)
+        Trip.objects.create(
+            user= user,
+            city= test_city,
+            state= test_state,
+            country= test_country,
+            start_date= start_object.isoformat(),
+            end_date= end_object.isoformat(),
+        )
+
+        trip = Trip.objects.get(user=user)
+        print_path = reverse('path_pulse:print_test', kwargs={'trip_id': trip.id})
+        response = self.client.get(path=print_path)
+        self.assertContains(response, "The Weather should be") 
+
+    def test_historic_plus_forecast_weather_dates(self):
+        user = User.objects.get(user_email= test_email)
+        previous_trip = Trip.objects.get(user=user)
+        delete_path = reverse('path_pulse:delete_trip', kwargs={'trip_id': previous_trip.id})
+        self.client.get(path=delete_path)
+        today = date.today()
+        start_object  = today + datetime.timedelta(3)
+        end_object = today + datetime.timedelta(14)
+        Trip.objects.create(
+            user= user,
+            city= test_city,
+            state= test_state,
+            country= test_country,
+            start_date= start_object.isoformat(),
+            end_date= end_object.isoformat(),
+        )
+
+        trip = Trip.objects.get(user=user)
+        print_path = reverse('path_pulse:print_test', kwargs={'trip_id': trip.id})
+        response = self.client.get(path=print_path)
+        self.assertContains(response, "The Weather should be") 
