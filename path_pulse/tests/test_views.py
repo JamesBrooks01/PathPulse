@@ -144,3 +144,9 @@ class DeleteTripTest(TestCase):
         delete_path = reverse('path_pulse:delete_trip', kwargs={'trip_id': trip.id})
         response = self.client.get(path=delete_path)
         self.assertContains(response, "action is unauthorized")
+
+class TripPrintNoUserTest(TestCase):
+    def test_no_logged_in_user(self):
+        path = reverse('path_pulse:print_test', kwargs={'trip_id': 1})
+        response = self.client.get(path=path)
+        self.assertRedirects(response, reverse('path_pulse:index'))
