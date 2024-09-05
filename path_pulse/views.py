@@ -88,35 +88,42 @@ def vote(request, user_id):
                     trip.start_date = form_data['start_date']
                     trip.end_date = form_data['end_date']
                 except (KeyError, user.DoesNotExist):
-                    return render(request,'path_pulse/index.html', {'user': user, 'error_message': "Please provide trip information",},)
+                    return render(request,'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has occurred. The most likely culprit is an incomplete form. If you believe this is wrong, please contact the Developer.",},)
                 else:
                     trip.save()
                     return HttpResponseRedirect(reverse('path_pulse:index'))
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
-def delete_trip(request, trip_id, user_id):
-    trip = get_object_or_404(Trip, pk=trip_id)
-    user = get_object_or_404(User, pk=user_id)
-    try:
-        trip.delete()
-    except(KeyError, trip.DoesNotExist, user.id != trip.user_id):
-            logged_in_user = request.session.get('user')
-            return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Trip does not Exist"})
+def delete_trip(request, trip_id):
+    logged_in_user = request.session.get('user')
+    if logged_in_user:
+        try:
+            trip = get_object_or_404(Trip, pk=trip_id)
+            user = get_object_or_404(User, user_email=logged_in_user['userinfo']['email'])
+        except(Http404):
+            return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has occurred. Either the Trip or User does not Exist. If you believe this is wrong, please contact the Developer."})
+        else:
+            if user.id == trip.user_id:
+                trip.delete()
+                return HttpResponseRedirect(reverse('path_pulse:index'))
+            else:
+                return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has occurred. Either the Trip does not exist Or this action is unauthorized via the user id assosiated with the trip does not match the logged in user"})  
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
     
-def trip_print(request, trip_id, user_id):
-    trip = get_object_or_404(Trip, pk=trip_id)
-    if trip:
-        logged_in_user = request.session.get('user')
-        if logged_in_user:
+def trip_print(request, trip_id):
+    logged_in_user = request.session.get('user')
+    if logged_in_user:
+        try:
+            trip = get_object_or_404(Trip, pk=trip_id)
+        except(Http404):
+                return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "An Error has Occurred. The requested trip does not Exist. If you believe this is in error, please contact the Developer."})   
+        else:
             if trip.user.user_email == logged_in_user['userinfo']['email']:
                 data = weather_data.weather_data(trip)
-                return render(request,'path_pulse/trip_print.html', {'session': logged_in_user, 'trip': data, 'user': user_id, 'object': trip})
+                return render(request,'path_pulse/trip_print.html', {'session': logged_in_user, 'trip': data, 'object': trip})
             else:
                 return render(request, 'path_pulse/error.html', {'session': logged_in_user, 'error_message': "Authentication Failed. The currently logged in user doesn't match with the user assosiated with the requested trip. If you believe this is in error, please contact the Developer."})
-        else:
-            return HttpResponseRedirect(reverse('path_pulse:index'))
     else:
         return HttpResponseRedirect(reverse('path_pulse:index'))
